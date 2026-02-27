@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Donate</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-main: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --bg-dark: #1a1a1a;
+            --text-white: #ffffff;
+            --divider-color: rgba(255, 255, 255, 0.1);
+            --crypto-color: #8B00FF;
+            --transition-speed: 0.3s;
+            
+            /* Gradients */
+            --grad-easypay: linear-gradient(135deg, #7CFC00, #ffd700, #ff8c00, #ff4500);
+            --grad-monobank: linear-gradient(135deg, #333333 0%, #0c192a 50%, #000000 100%);
+            --grad-donalerts: linear-gradient(135deg, #e2632c, #fb4955, #ff3286, #fc39be, #d35bf8);
+            --grad-paypal: linear-gradient(135deg, #003087 0%, #009cde 100%);
+            --grad-crypto: linear-gradient(135deg, #8B00FF, #4B0082, #000080);
+        }
+
+        /* --- Base & Reset --- */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            overflow: hidden; /* Desktop default */
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* --- Payment Sectors --- */
+        .payment-sector {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-white);
+            transition: all var(--transition-speed) ease;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+            padding: 20px 15px;
+            text-align: center;
+            box-sizing: border-box;
+            min-height: 140px; 
+            border-bottom: 1px solid rgba(0,0,0,0.2);
+            opacity: 0; /* Для начального состояния перед анимацией */
+            transform: translateY(15px);
+        }
+
+        /* Gradients */
+        .easypay { background: var(--grad-easypay); }
+        .monobank { background: var(--grad-monobank); }
+        .donalerts { background: var(--grad-donalerts); }
+        .paypal { background: var(--grad-paypal); }
+        .crypto { background: var(--grad-crypto); border-bottom: none; overflow: visible; position: relative; }
+
+        /* --- Typography & Elements --- */
+        .main-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            transition: transform 0.3s ease;
+        }
+
+        .service-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.95;
+            margin-bottom: 0; 
+            line-height: 1.4;
+            max-width: 90%;
+            transition: margin-bottom 0.3s ease;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* FIX: Увеличенный отступ для крипто-секции (Desktop) */
+        .crypto .subtitle {
+            margin-bottom: 24px;
+        }
+
+        .arrow {
+            font-size: 24px;
+            margin: 0 10px;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        /* --- INFO NOTE (Исправлено обрезание текста) --- */
+        .info-note {
+            font-size: 12px;
+            font-style: italic;
+            opacity: 0;
+            margin-top: 0;
+            max-height: 0; /* Начальное скрытое состояние для анимации десктопа */
+            overflow: hidden; 
+            transform: translateY(10px);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            
+            /* Новые стили для предотвращения обрезания */
+            line-height: 1.6;        /* Увеличено с 1.4 */
+            padding: 5px 10px;       /* Добавлен вертикальный padding */
+            box-sizing: border-box;
+            width: 100%;
+            flex-shrink: 0;          /* Запрет сжатия во flex-контейнере */
+            white-space: normal;     /* Разрешаем перенос строк */
+        }
+
+        .divider {
+            height: 2px;
+            background: var(--divider-color);
+            z-index: 1;
+        }
+
+        /* --- DonationAlerts Animation (Bubble) --- */
+        .da-wrapper {
+            white-space: nowrap;
+            display: inline-block;
+            margin: 0 4px;
+        }
+        
+        .da-face {
+            display: inline-block;
+            vertical-align: baseline;
+        }
+
+        .da-cloud {
+            display: inline-block;
+            position: relative;
+            top: -0.5em; /* Поднимаем на полстроки выше */
+            font-size: 0.8em; /* Исходный размер чуть меньше */
+            transform-origin: bottom left; /* Растет от головы */
+            animation: thinkPulse 6s ease-in-out infinite;
+        }
+
+        @keyframes thinkPulse {
+            0% { transform: scale(1); }
+            20% { transform: scale(2.5); } /* Быстрое надувание */
+            50% { transform: scale(2.5); } /* Пауза в большом состоянии */
+            80% { transform: scale(1); }   /* Сдувание */
+            100% { transform: scale(1); }
+        }
+
+        /* --- Payment Methods Icons --- */
+        .payment-methods {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 12px;
+            max-width: 90%;
+            transition: margin 0.3s ease;
+        }
+
+        .method-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+        }
+
+        .method-icon {
+            font-size: 22px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .method-label {
+            font-size: 11px;
+            opacity: 0.9;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        /* --- DESKTOP Logic --- */
+        @media (min-width: 769px) {
+            .payment-sector:hover {
+                flex: 1.3;
+                filter: brightness(1.1);
+                z-index: 2;
+                box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            }
+            .easypay:hover { box-shadow: 0 0 30px rgba(255, 144, 0, 0.4); }
+            .monobank:hover { box-shadow: 0 0 30px rgba(255, 255, 255, 0.2); }
+            .donalerts:hover { box-shadow: 0 0 30px rgba(246, 36, 52, 0.4); }
+            .paypal:hover { box-shadow: 0 0 30px rgba(0, 48, 135, 0.4); }
+            .crypto:hover, .crypto.expanded { box-shadow: 0 0 30px rgba(139, 0, 255, 0.6); }
+
+            .payment-sector:hover .main-icon { transform: scale(1.15); }
+            .easypay:hover .arrow { transform: scale(1.2); }
+            
+            .payment-sector:not(.crypto) .payment-methods { display: none; }
+            .crypto .payment-methods { display: flex; }
+
+            /* --- INFO NOTE HOVER (Обычные секции) --- */
+            .payment-sector:not(.crypto):hover .info-note {
+                opacity: 0.85;
+                max-height: 120px; /* Увеличено с запасом */
+                margin-top: 8px;
+                transform: translateY(0);
+                padding-bottom: 8px; /* Доп. отступ снизу при ховере */
+            }
+            
+            .payment-sector:not(.crypto):hover .subtitle {
+                margin-bottom: 4px;
+            }
+
+            /* --- CRYPTO SECTION DESKTOP FIX --- */
+            .crypto .payment-methods {
+                margin-bottom: 30px; /* Увеличенный отступ от иконок до низа блока */
+            }
+
+            .crypto .info-note {
+                position: absolute;
+                bottom: 15px; 
+                left: 0;
+                right: 0;
+                margin: 0 auto;
+                max-height: none; /* Текст всегда видим (нет анимации высоты) */
+                overflow: visible; /* Разрешаем выход за границы если надо */
+                width: 100%;
+                z-index: 5;
+                opacity: 0; 
+                transform: translateY(10px);
+                padding: 5px 20px; /* Безопасные отступы */
+            }
+            
+            .crypto:hover .info-note {
+                opacity: 0.85;
+                transform: translateY(0);
+            }
+
+            /* Crypto Popup Logic */
+            .crypto-popup {
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%) translateY(-10px);
+                background: rgba(0, 0, 0, 0.95);
+                border: 1px solid rgba(139, 0, 255, 0.5);
+                border-radius: 10px;
+                padding: 15px;
+                width: 280px;
+                z-index: 1000;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+                pointer-events: none;
+            }
+
+            .method-item:hover .method-icon { transform: scale(1.1); background: rgba(255, 255, 255, 0.25); }
+            .method-item:hover .crypto-popup {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(-50%) translateY(-5px);
+                pointer-events: auto;
+            }
+            
+            .crypto.expanded { flex: 1.3; filter: brightness(1.1); }
+        }
+
+        .crypto-popup h4 { margin: 0 0 10px 0; font-size: 14px; color: var(--crypto-color); }
+        .crypto-details { font-size: 11px; margin-bottom: 10px; line-height: 1.4; text-align: left; }
+        .crypto-address {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 10px;
+            word-break: break-all;
+            margin-bottom: 10px;
+            user-select: all;
+        }
+
+        /* --- Buttons --- */
+        .copy-btn, .mobile-copy-btn {
+            background: var(--crypto-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .copy-btn { padding: 8px 15px; font-size: 11px; width: 100%; }
+        .copy-btn:hover, .mobile-copy-btn:hover { background: #9B30FF; }
+        .copy-btn.copied, .mobile-copy-btn.copied { background: #00FF00; color: #000; }
+
+        /* --- Mobile Modal --- */
+        .mobile-crypto-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            padding: 20px;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .mobile-crypto-modal.active { display: flex; animation: fadeIn 0.3s ease; }
+        
+        .mobile-crypto-content {
+            background: var(--grad-crypto);
+            border-radius: 15px;
+            padding: 20px;
+            width: 90%;
+            max-width: 350px;
+            max-height: 80vh;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.3s ease;
+        }
+
+        .mobile-crypto-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+        .mobile-crypto-title { font-size: 18px; font-weight: bold; }
+        .mobile-crypto-close { background: none; border: none; color: white; font-size: 24px; padding: 5px; cursor: pointer; }
+        .mobile-crypto-details { font-size: 14px; margin-bottom: 15px; line-height: 1.4; }
+        .mobile-crypto-address {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .mobile-copy-btn { padding: 12px 20px; width: 100%; font-size: 14px; font-weight: 600; }
+
+        /* --- Animations --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.85; } 100% { opacity: 1; } }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+
+        .loading-state {
+            cursor: wait !important;
+            pointer-events: none !important;
+            animation: pulse 1s infinite;
+        }
+        
+        .error-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            font-size: 14px;
+            animation: fadeInOut 3s ease forwards;
+        }
+
+        /* --- Mobile/Tablet Optimizations --- */
+        @media (max-width: 768px) {
+            body, html, .container {
+                height: 100dvh;
+                min-height: 100dvh;
+                overflow: hidden !important;
+            }
+
+            .payment-sector {
+                flex: 1;
+                min-height: 0;
+                padding: 15px 10px;
+                flex-shrink: 0;
+                /* Reset hover effects */
+                flex: 1 !important; 
+                transform: none !important;
+                filter: none !important;
+                box-shadow: none !important;
+            }
+            
+            .crypto { flex: 1.2 !important; }
+
+            /* FIX: Увеличенный отступ для крипто-секции (Mobile) */
+            .crypto .subtitle {
+                margin-bottom: 16px;
+            }
+
+            .main-icon { font-size: 36px; margin-bottom: 8px; }
+            .subtitle { font-size: 13px; margin-bottom: 4px; line-height: 1.3; margin-top: 0; }
+            .service-title { font-size: 16px; margin-bottom: 5px; }
+            .arrow { font-size: 20px; margin: 0 8px; }
+            
+            /* --- INFO NOTE MOBILE FIX --- */
+            .info-note {
+                font-size: 10px;
+                margin-top: 6px;
+                opacity: 0.85;
+                max-height: none; 
+                transform: none;
+                display: block;
+                overflow: visible !important; /* Гарантируем видимость */
+                height: auto; /* Высота по содержимому */
+                padding: 4px 5px; /* Вертикальный паддинг */
+            }
+            
+            .crypto .info-note {
+                margin-top: 15px; 
+            }
+            
+            .divider { height: 1px; flex: 0 0 1px; }
+            .crypto-popup { display: none !important; }
+
+            .payment-methods { display: none; }
+            .crypto .payment-methods {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 10px;
+            }
+
+            .method-icon { width: 32px; height: 32px; font-size: 18px; }
+            .method-label { font-size: 9px; max-width: 50px; }
+        }
+
+        @media (max-height: 600px) and (max-width: 480px) {
+            .payment-sector { padding: 8px 5px; }
+            .main-icon { font-size: 28px; margin-bottom: 4px; }
+            .subtitle { font-size: 11px; margin-bottom: 4px; }
+            .method-icon { width: 26px; height: 26px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <a href="https://easypay.ua/moneytransfer/transfer2card?id=80001507" target="_self" class="payment-sector easypay">
+        <div class="main-icon">💳</div>
+        <div class="subtitle">Українська картка <span class="arrow">→</span> Українська картка</div>
+        <div class="info-note">Тільки для українських банківських карт</div>
+    </a>
+
+    <div class="divider"></div>
+
+    <a href="https://send.monobank.ua/jar/7vf576b6aT" target="_self" class="payment-sector monobank">
+        <div class="main-icon">🏦</div>
+        <div class="subtitle">Google Pay, Apple Pay, Visa, MasterCard</div>
+        <div class="info-note">Transfers from Europe and USA</div>
+    </a>
+
+    <div class="divider"></div>
+
+    <a href="https://www.donationalerts.com/r/maiia_miller" target="_self" class="payment-sector donalerts">
+        <div class="main-icon">💰</div>
+        <div class="service-title">DonationAlerts</div>
+        
+        <div class="subtitle">
+            Cообщение на Стрим 
+            <span class="da-wrapper">
+                <span class="da-face">😏</span><span class="da-cloud">💭</span>
+            </span>
+            Message on Stream
+        </div>
+        
+        <div class="info-note">Bank card Worldwide</div>
+    </a>
+
+    <div class="divider"></div>
+
+    <div class="payment-sector crypto" id="crypto-section">
+        <div class="main-icon">₿</div>
+        <div class="subtitle">Cryptocurrency payments</div>
+        
+        <div class="payment-methods">
+            <div class="method-item" data-crypto-type="usdt">
+                <div class="method-icon">💵</div>
+                <div class="method-label">USDT</div>
+                <div class="crypto-popup">
+                    <h4>USDT (BEP20)</h4>
+                    <div class="crypto-details">
+                        <strong>Network:</strong> BNB Smart Chain (BEP20)<br>
+                        <strong>Coin:</strong> USDT
+                    </div>
+                    <div class="crypto-address">0xc57a3603b573258fcc49faf35e7930b908d4e548</div>
+                    <button class="copy-btn" data-address="0xc57a3603b573258fcc49faf35e7930b908d4e548">Copy Address</button>
+                </div>
+            </div>
+            
+            <div class="method-item" data-crypto-type="btc">
+                <div class="method-icon">₿</div>
+                <div class="method-label">BTC</div>
+                <div class="crypto-popup">
+                    <h4>Bitcoin (BTC)</h4>
+                    <div class="crypto-details">
+                        <strong>Network:</strong> Bitcoin<br>
+                        <strong>Coin:</strong> BTC
+                    </div>
+                    <div class="crypto-address">14JSDaeXXFa4ed1pkZ1dXn6SVh5cEJkGjF</div>
+                    <button class="copy-btn" data-address="14JSDaeXXFa4ed1pkZ1dXn6SVh5cEJkGjF">Copy Address</button>
+                </div>
+            </div>
+            
+            <div class="method-item" data-crypto-type="eth">
+                <div class="method-icon">Ξ</div>
+                <div class="method-label">ETH</div>
+                <div class="crypto-popup">
+                    <h4>Ethereum (ERC20)</h4>
+                    <div class="crypto-details">
+                        <strong>Network:</strong> Ethereum (ERC20)<br>
+                        <strong>Coin:</strong> ETH
+                    </div>
+                    <div class="crypto-address">0xc57a3603b573258fcc49faf35e7930b908d4e548</div>
+                    <button class="copy-btn" data-address="0xc57a3603b573258fcc49faf35e7930b908d4e548">Copy Address</button>
+                </div>
+            </div>
+            
+            <div class="method-item" data-crypto-type="binance">
+                <div class="method-icon">🅱️</div>
+                <div class="method-label">Binance</div>
+                <div class="crypto-popup">
+                    <h4>Binance ID</h4>
+                    <div class="crypto-details">
+                        <strong>Type:</strong> Binance User ID
+                    </div>
+                    <div class="crypto-address">498076806</div>
+                    <button class="copy-btn" data-address="498076806">Copy ID</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-note">Hover over currency for details</div>
+    </div>
+</div>
+
+<div class="mobile-crypto-modal" id="mobileCryptoModal">
+    <div class="mobile-crypto-content">
+        <div class="mobile-crypto-header">
+            <div class="mobile-crypto-title" id="mobileCryptoTitle">Crypto Details</div>
+            <button class="mobile-crypto-close" id="mobileCryptoClose">&times;</button>
+        </div>
+        <div class="mobile-crypto-details" id="mobileCryptoDetails"></div>
+        <div class="mobile-crypto-address" id="mobileCryptoAddress"></div>
+        <button class="mobile-copy-btn" id="mobileCopyBtn">Copy Address</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- 1. Dynamic Favicon Logic ---
+        const emojis = ['💖', '🐱', '🎁', '✨', '💲'];
+        let emojiIndex = 0;
+        const faviconLink = document.querySelector("link[rel*='icon']");
+
+        const updateFavicon = () => {
+            const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>${emojis[emojiIndex]}</text></svg>`;
+            if(faviconLink) {
+                faviconLink.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+                emojiIndex = (emojiIndex + 1) % emojis.length;
+            }
+        };
+        setInterval(updateFavicon, 2500);
+
+        // --- 2. Animations on Load ---
+        const sectors = document.querySelectorAll('.payment-sector');
+        sectors.forEach((sector, index) => {
+            setTimeout(() => {
+                sector.style.opacity = '1';
+                sector.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+
+        // --- 3. Click Handlers (Loading State) ---
+        sectors.forEach(link => {
+            if (link.classList.contains('crypto')) return;
+
+            link.addEventListener('click', function(e) {
+                const isEnglish = link.classList.contains('paypal') || link.classList.contains('monobank');
+                const loadingTxt = isEnglish ? 'Preparing payment...' : 'Подготовка оплаты...';
+                const subTxt = isEnglish ? 'Redirecting...' : 'Перенаправляем...';
+                
+                const originalHTML = this.innerHTML;
+                
+                // При клике: инлайн стили гарантируют, что текст будет виден
+                this.innerHTML = `
+                    <div class="main-icon">⏳</div>
+                    <div class="subtitle" style="margin-bottom:8px">${loadingTxt}</div>
+                    <div class="info-note" style="opacity:1; max-height:none; transform:none; display:block; margin-top:0;">${subTxt}</div>
+                `;
+                this.classList.add('loading-state');
+
+                setTimeout(() => {
+                    this.innerHTML = originalHTML;
+                    this.classList.remove('loading-state');
+                    if (document.visibilityState === 'visible') {
+                        showErrorToast(isEnglish ? 'Connection issue. Try again.' : 'Ошибка соединения. Попробуйте снова.');
+                    }
+                }, 4000);
+            });
+        });
+
+        function showErrorToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'error-toast';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // --- 4. Crypto Logic ---
+        const cryptoData = {
+            usdt: { title: "USDT (BEP20)", details: "<strong>Network:</strong> BNB Smart Chain (BEP20)<br><strong>Coin:</strong> USDT", address: "0xc57a3603b573258fcc49faf35e7930b908d4e548" },
+            btc: { title: "Bitcoin (BTC)", details: "<strong>Network:</strong> Bitcoin<br><strong>Coin:</strong> BTC", address: "14JSDaeXXFa4ed1pkZ1dXn6SVh5cEJkGjF" },
+            eth: { title: "Ethereum (ERC20)", details: "<strong>Network:</strong> Ethereum (ERC20)<br><strong>Coin:</strong> ETH", address: "0xc57a3603b573258fcc49faf35e7930b908d4e548" },
+            binance: { title: "Binance ID", details: "<strong>Type:</strong> Binance User ID", address: "498076806" }
+        };
+
+        const copyToClipboard = (text, btnElement) => {
+            const originalText = btnElement.textContent;
+            const handleSuccess = () => {
+                btnElement.textContent = 'Copied!';
+                btnElement.classList.add('copied');
+                setTimeout(() => {
+                    btnElement.textContent = originalText;
+                    btnElement.classList.remove('copied');
+                }, 2000);
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(handleSuccess).catch(() => legacyCopy(text, handleSuccess));
+            } else {
+                legacyCopy(text, handleSuccess);
+            }
+        };
+
+        const legacyCopy = (text, callback) => {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try { document.execCommand('copy'); callback(); } catch (err) {}
+            document.body.removeChild(textArea);
+        };
+
+        // --- 5. Mobile Logic ---
+        const mobileModal = document.getElementById('mobileCryptoModal');
+        const elements = {
+            title: document.getElementById('mobileCryptoTitle'),
+            details: document.getElementById('mobileCryptoDetails'),
+            address: document.getElementById('mobileCryptoAddress'),
+            copyBtn: document.getElementById('mobileCopyBtn'),
+            closeBtn: document.getElementById('mobileCryptoClose')
+        };
+        let currentMobileAddress = '';
+
+        document.querySelectorAll('.crypto .method-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (window.matchMedia("(max-width: 768px)").matches) {
+                    e.stopPropagation();
+                    const type = this.getAttribute('data-crypto-type');
+                    const data = cryptoData[type];
+                    if (data) {
+                        elements.title.textContent = data.title;
+                        elements.details.innerHTML = data.details;
+                        elements.address.textContent = data.address;
+                        currentMobileAddress = data.address;
+                        elements.copyBtn.textContent = type === 'binance' ? 'Copy ID' : 'Copy Address';
+                        elements.copyBtn.classList.remove('copied');
+                        mobileModal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                }
+            });
+        });
+
+        const closeModal = () => {
+            mobileModal.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        elements.closeBtn.addEventListener('click', closeModal);
+        mobileModal.addEventListener('click', (e) => { if (e.target === mobileModal) closeModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+        elements.copyBtn.addEventListener('click', function() { copyToClipboard(currentMobileAddress, this); });
+
+        // --- 6. Desktop Hover Logic ---
+        const cryptoSector = document.getElementById('crypto-section');
+        let expandTimer;
+
+        const handleEnter = () => {
+            if (window.matchMedia("(min-width: 769px)").matches) {
+                clearTimeout(expandTimer);
+                cryptoSector.classList.add('expanded');
+            }
+        };
+
+        const handleLeave = (e) => {
+            if (window.matchMedia("(min-width: 769px)").matches) {
+                const related = e.relatedTarget;
+                if (related && (related.closest('.crypto') || related.closest('.crypto-popup'))) return;
+                expandTimer = setTimeout(() => {
+                    cryptoSector.classList.remove('expanded');
+                }, 300);
+            }
+        };
+
+        cryptoSector.addEventListener('mouseenter', handleEnter);
+        cryptoSector.addEventListener('mouseleave', handleLeave);
+        
+        document.querySelectorAll('.crypto-popup').forEach(popup => {
+            popup.addEventListener('mouseenter', handleEnter);
+            popup.addEventListener('mouseleave', handleLeave);
+        });
+
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                copyToClipboard(this.getAttribute('data-address'), this);
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
