@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Donate</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>">
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --font-main: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -18,7 +18,7 @@
             --divider-color: rgba(255, 255, 255, 0.1);
             --crypto-color: #8B00FF;
             --transition-speed: 0.3s;
-            
+
             /* Gradients */
             --grad-easypay: linear-gradient(135deg, #7CFC00, #ffd700, #ff8c00, #ff4500);
             --grad-monobank: linear-gradient(135deg, #333333 0%, #0c192a 50%, #000000 100%);
@@ -61,7 +61,7 @@
             padding: 20px 15px;
             text-align: center;
             box-sizing: border-box;
-            min-height: 140px; 
+            min-height: 140px;
             border-bottom: 1px solid rgba(0,0,0,0.2);
             opacity: 0; /* Для начального состояния перед анимацией */
             transform: translateY(15px);
@@ -93,7 +93,7 @@
             font-size: 16px;
             font-weight: 500;
             opacity: 0.95;
-            margin-bottom: 0; 
+            margin-bottom: 0;
             line-height: 1.4;
             max-width: 90%;
             transition: margin-bottom 0.3s ease;
@@ -120,10 +120,10 @@
             opacity: 0;
             margin-top: 0;
             max-height: 0; /* Начальное скрытое состояние для анимации десктопа */
-            overflow: hidden; 
+            overflow: hidden;
             transform: translateY(10px);
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-            
+
             /* Новые стили для предотвращения обрезания */
             line-height: 1.6;        /* Увеличено с 1.4 */
             padding: 5px 10px;       /* Добавлен вертикальный padding */
@@ -145,7 +145,7 @@
             display: inline-block;
             margin: 0 4px;
         }
-        
+
         .da-face {
             display: inline-block;
             vertical-align: baseline;
@@ -223,7 +223,7 @@
 
             .payment-sector:hover .main-icon { transform: scale(1.15); }
             .easypay:hover .arrow { transform: scale(1.2); }
-            
+
             .payment-sector:not(.crypto) .payment-methods { display: none; }
             .crypto .payment-methods { display: flex; }
 
@@ -235,7 +235,7 @@
                 transform: translateY(0);
                 padding-bottom: 8px; /* Доп. отступ снизу при ховере */
             }
-            
+
             .payment-sector:not(.crypto):hover .subtitle {
                 margin-bottom: 4px;
             }
@@ -247,7 +247,7 @@
 
             .crypto .info-note {
                 position: absolute;
-                bottom: 15px; 
+                bottom: 15px;
                 left: 0;
                 right: 0;
                 margin: 0 auto;
@@ -255,11 +255,11 @@
                 overflow: visible; /* Разрешаем выход за границы если надо */
                 width: 100%;
                 z-index: 5;
-                opacity: 0; 
+                opacity: 0;
                 transform: translateY(10px);
                 padding: 5px 20px; /* Безопасные отступы */
             }
-            
+
             .crypto:hover .info-note {
                 opacity: 0.85;
                 transform: translateY(0);
@@ -270,7 +270,7 @@
                 position: absolute;
                 bottom: 100%;
                 left: 50%;
-                transform: translateX(-50%) translateY(-10px);
+                transform: translateX(-50%) translateY(-6px);
                 background: rgba(0, 0, 0, 0.95);
                 border: 1px solid rgba(139, 0, 255, 0.5);
                 border-radius: 10px;
@@ -285,14 +285,30 @@
                 pointer-events: none;
             }
 
+            /* Мост — невидимая зона перекрывает зазор между кнопкой и попапом */
+            .crypto-popup::after {
+                content: '';
+                position: absolute;
+                bottom: -14px;
+                left: 0;
+                right: 0;
+                height: 14px;
+            }
+
             .method-item:hover .method-icon { transform: scale(1.1); background: rgba(255, 255, 255, 0.25); }
-            .method-item:hover .crypto-popup {
+            .method-item:not(.other-currencies-btn):hover .crypto-popup {
+                opacity: 1;
+                visibility: visible;
+                transform: translateX(-50%) translateY(-2px);
+                pointer-events: auto;
+            }
+            .other-popup.open {
                 opacity: 1;
                 visibility: visible;
                 transform: translateX(-50%) translateY(-5px);
                 pointer-events: auto;
             }
-            
+
             .crypto.expanded { flex: 1.3; filter: brightness(1.1); }
         }
 
@@ -335,7 +351,7 @@
             backdrop-filter: blur(5px);
         }
         .mobile-crypto-modal.active { display: flex; animation: fadeIn 0.3s ease; }
-        
+
         .mobile-crypto-content {
             background: var(--grad-crypto);
             border-radius: 15px;
@@ -370,7 +386,235 @@
         }
         .mobile-copy-btn { padding: 12px 20px; width: 100%; font-size: 14px; font-weight: 600; }
 
-        /* --- Animations --- */
+        /* --- Coin button images (USDT/BTC/ETH icons) --- */
+        .coin-btn-img {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            object-fit: contain;
+            display: block;
+        }
+        .coin-btn-fallback { display: none; }
+
+
+        .other-currencies-btn .method-icon {
+            background: rgba(255,255,255,0.15);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- Other Currencies: Desktop Popup select --- */
+        /* Тот же стиль что и у USDT/BTC/ETH, но со скроллом */
+        .other-popup {
+            width: 270px;
+
+
+
+        }
+        /* Когда попап открыт — вся крипто-секция поднимается выше DonationAlerts */
+        .crypto.other-open {
+            z-index: 100 !important;
+        }
+        .other-select-wrap {
+            position: relative;
+            margin-bottom: 0;
+        }
+        .other-select {
+            width: 100%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(139,0,255,0.5);
+            border-radius: 7px;
+            color: white;
+            font-family: var(--font-main);
+            font-size: 13px;
+            padding: 8px 28px 8px 10px;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .other-select:hover, .other-select:focus { border-color: rgba(139,0,255,0.9); }
+        .other-select option { background: #1a1a2e; color: white; }
+        .other-select-arrow {
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .other-result { margin-top: 12px; }
+
+        /* --- Other Currencies: Mobile select --- */
+        .other-select-wrap-mobile {
+            position: relative;
+            margin-bottom: 0;
+        }
+        .other-select-mobile {
+            width: 100%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            color: white;
+            font-family: var(--font-main);
+            font-size: 15px;
+            padding: 12px 36px 12px 14px;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .other-select-mobile:focus { border-color: rgba(139,0,255,0.9); }
+        .other-select-mobile option { background: #1a1a2e; color: white; }
+        .other-select-arrow-mobile {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        .other-result-mobile { margin-top: 16px; }
+
+        /* --- Custom coin dropdown --- */
+        .coin-dropdown { position: relative; width: 100%; }
+
+        .coin-drop-trigger {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(139,0,255,0.5);
+            border-radius: 7px;
+            color: white;
+            font-family: var(--font-main);
+            font-size: 13px;
+            padding: 8px 10px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        .coin-drop-trigger:hover,
+        .coin-dropdown.open .coin-drop-trigger { border-color: rgba(139,0,255,0.9); }
+        .coin-drop-trigger-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .coin-drop-trigger-mobile {
+            font-size: 15px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .coin-drop-list {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 4px);
+            left: 0; right: 0;
+            background: #10102a;
+            border: 1px solid rgba(139,0,255,0.5);
+            border-radius: 8px;
+            overflow-y: auto;
+            /* Нет max-height — показываем весь список.
+               Скроллбар появится только если список не влезет в экран */
+            max-height: min(80vh, 600px);
+            z-index: 9999;
+            box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+            /* Стилизованный скроллбар под тему */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(139,0,255,0.6) rgba(255,255,255,0.05);
+        }
+        .coin-drop-list::-webkit-scrollbar { width: 5px; }
+        .coin-drop-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 4px; }
+        .coin-drop-list::-webkit-scrollbar-thumb { background: rgba(139,0,255,0.55); border-radius: 4px; }
+        .coin-drop-list::-webkit-scrollbar-thumb:hover { background: rgba(139,0,255,0.85); }
+
+        .coin-drop-list-mobile {
+            bottom: auto;
+            top: calc(100% + 4px);
+            max-height: min(55vh, 400px);
+        }
+        .coin-dropdown.open .coin-drop-list { display: block; }
+
+        /* Одна строка: иконка | название — сеть */
+        .coin-drop-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 7px 11px;
+            cursor: pointer;
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+            transition: background 0.15s;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .coin-drop-item:hover { background: rgba(139,0,255,0.25); color: #fff; }
+        .coin-drop-item.selected { background: rgba(139,0,255,0.15); }
+
+        .coin-drop-item-mobile {
+            font-size: 14px;
+            padding: 9px 14px;
+            gap: 11px;
+        }
+
+        .coin-drop-icon {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            object-fit: contain;
+            flex-shrink: 0;
+            display: block;
+        }
+        .coin-drop-icon-emoji {
+            font-size: 16px;
+            line-height: 1;
+            flex-shrink: 0;
+            width: 20px;
+            text-align: center;
+        }
+        .coin-drop-icon-placeholder { width: 20px; flex-shrink: 0; display: inline-block; }
+
+        /* Одна строка: убираем flex-column, делаем inline */
+        .coin-drop-item-info {
+            display: flex;
+            flex-direction: row;
+            align-items: baseline;
+            gap: 5px;
+            overflow: hidden;
+            min-width: 0;
+        }
+        .coin-drop-item-title {
+            font-weight: 600;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .coin-drop-item-network {
+            font-size: 10px;
+            opacity: 0.5;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .coin-drop-item-sep {
+            font-size: 10px;
+            opacity: 0.35;
+            flex-shrink: 0;
+        }
+
+        /* стрелка поворачивается когда открыто */
+        .coin-dropdown.open .other-select-arrow,
+        .coin-dropdown.open .other-select-arrow-mobile { opacity: 1; display: inline-block; transform: rotate(180deg); }
+
+
+
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.85; } 100% { opacity: 1; } }
@@ -386,7 +630,7 @@
             pointer-events: none !important;
             animation: pulse 1s infinite;
         }
-        
+
         .error-toast {
             position: fixed;
             top: 20px;
@@ -415,12 +659,12 @@
                 padding: 15px 10px;
                 flex-shrink: 0;
                 /* Reset hover effects */
-                flex: 1 !important; 
+                flex: 1 !important;
                 transform: none !important;
                 filter: none !important;
                 box-shadow: none !important;
             }
-            
+
             .crypto { flex: 1.2 !important; }
 
             /* FIX: Увеличенный отступ для крипто-секции (Mobile) */
@@ -432,24 +676,24 @@
             .subtitle { font-size: 13px; margin-bottom: 4px; line-height: 1.3; margin-top: 0; }
             .service-title { font-size: 16px; margin-bottom: 5px; }
             .arrow { font-size: 20px; margin: 0 8px; }
-            
+
             /* --- INFO NOTE MOBILE FIX --- */
             .info-note {
                 font-size: 10px;
                 margin-top: 6px;
                 opacity: 0.85;
-                max-height: none; 
+                max-height: none;
                 transform: none;
                 display: block;
                 overflow: visible !important; /* Гарантируем видимость */
                 height: auto; /* Высота по содержимому */
                 padding: 4px 5px; /* Вертикальный паддинг */
             }
-            
+
             .crypto .info-note {
-                margin-top: 15px; 
+                margin-top: 15px;
             }
-            
+
             .divider { height: 1px; flex: 0 0 1px; }
             .crypto-popup { display: none !important; }
 
@@ -476,8 +720,8 @@
 <body>
 
 <div class="container">
-    
-    <a href="https://easypay.ua/moneytransfer/transfer2card?id=80001507" target="_self" class="payment-sector easypay">
+
+    <a id="link-easypay" href="#" target="_self" class="payment-sector easypay">
         <div class="main-icon">💳</div>
         <div class="subtitle">Українська картка <span class="arrow">→</span> Українська картка</div>
         <div class="info-note">Тільки для українських банківських карт</div>
@@ -485,7 +729,7 @@
 
     <div class="divider"></div>
 
-    <a href="https://send.monobank.ua/jar/7vf576b6aT" target="_self" class="payment-sector monobank">
+    <a id="link-monobank" href="#" target="_self" class="payment-sector monobank">
         <div class="main-icon">🏦</div>
         <div class="subtitle">Google Pay, Apple Pay, Visa, MasterCard</div>
         <div class="info-note">Transfers from Europe and USA</div>
@@ -493,18 +737,18 @@
 
     <div class="divider"></div>
 
-    <a href="https://www.donationalerts.com/r/maiia_miller" target="_self" class="payment-sector donalerts">
+    <a id="link-donationalerts" href="#" target="_self" class="payment-sector donalerts">
         <div class="main-icon">💰</div>
         <div class="service-title">DonationAlerts</div>
-        
+
         <div class="subtitle">
-            Cообщение на Стрим 
+            Cообщение на Стрим
             <span class="da-wrapper">
                 <span class="da-face">😏</span><span class="da-cloud">💭</span>
             </span>
             Message on Stream
         </div>
-        
+
         <div class="info-note">Bank card Worldwide</div>
     </a>
 
@@ -513,10 +757,10 @@
     <div class="payment-sector crypto" id="crypto-section">
         <div class="main-icon">₿</div>
         <div class="subtitle">Cryptocurrency payments</div>
-        
+
         <div class="payment-methods">
             <div class="method-item" data-crypto-type="usdt">
-                <div class="method-icon">💵</div>
+                <div class="method-icon"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/825.png" class="coin-btn-img" alt="USDT" onerror="this.style.display='none';this.nextSibling.style.display='inline'"><span class="coin-btn-fallback">💵</span></div>
                 <div class="method-label">USDT</div>
                 <div class="crypto-popup">
                     <h4>USDT (BEP20)</h4>
@@ -528,9 +772,9 @@
                     <button class="copy-btn" data-address="0xc57a3603b573258fcc49faf35e7930b908d4e548">Copy Address</button>
                 </div>
             </div>
-            
+
             <div class="method-item" data-crypto-type="btc">
-                <div class="method-icon">₿</div>
+                <div class="method-icon"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1.png" class="coin-btn-img" alt="BTC" onerror="this.style.display='none';this.nextSibling.style.display='inline'"><span class="coin-btn-fallback">₿</span></div>
                 <div class="method-label">BTC</div>
                 <div class="crypto-popup">
                     <h4>Bitcoin (BTC)</h4>
@@ -542,9 +786,9 @@
                     <button class="copy-btn" data-address="14JSDaeXXFa4ed1pkZ1dXn6SVh5cEJkGjF">Copy Address</button>
                 </div>
             </div>
-            
+
             <div class="method-item" data-crypto-type="eth">
-                <div class="method-icon">Ξ</div>
+                <div class="method-icon"><img src="https://s2.coinmarketcap.com/static/img/coins/64x64/1027.png" class="coin-btn-img" alt="ETH" onerror="this.style.display='none';this.nextSibling.style.display='inline'"><span class="coin-btn-fallback">Ξ</span></div>
                 <div class="method-label">ETH</div>
                 <div class="crypto-popup">
                     <h4>Ethereum (ERC20)</h4>
@@ -556,21 +800,37 @@
                     <button class="copy-btn" data-address="0xc57a3603b573258fcc49faf35e7930b908d4e548">Copy Address</button>
                 </div>
             </div>
-            
-            <div class="method-item" data-crypto-type="binance">
-                <div class="method-icon">🅱️</div>
-                <div class="method-label">Binance</div>
-                <div class="crypto-popup">
-                    <h4>Binance ID</h4>
-                    <div class="crypto-details">
-                        <strong>Type:</strong> Binance User ID
+
+            <div class="method-item other-currencies-btn" id="otherCurrenciesBtn">
+                <div class="method-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="5" cy="12" r="2" fill="white"/>
+                        <circle cx="12" cy="12" r="2" fill="white"/>
+                        <circle cx="19" cy="12" r="2" fill="white"/>
+                    </svg>
+                </div>
+                <div class="method-label">More</div>
+                <!-- Desktop popup -->
+                <div class="crypto-popup other-popup" id="otherDesktopPopup">
+                    <h4>Choose cryptocurrency</h4>
+                    <div class="other-select-wrap">
+                        <div class="coin-dropdown" id="coinDropDesktop">
+                            <div class="coin-drop-trigger" id="coinDropTriggerDsk">
+                                <span class="coin-drop-trigger-text">👉 Pick a coin 👈</span>
+                                <span class="other-select-arrow" style="position:static;transform:none;margin-left:auto">▾</span>
+                            </div>
+                            <div class="coin-drop-list" id="coinDropListDsk"></div>
+                        </div>
                     </div>
-                    <div class="crypto-address">498076806</div>
-                    <button class="copy-btn" data-address="498076806">Copy ID</button>
+                    <div class="other-result" id="otherResultDesktop" style="display:none;">
+                        <div class="crypto-details" id="otherDetailsDesktop"></div>
+                        <div class="crypto-address" id="otherAddressDesktop"></div>
+                        <button class="copy-btn" id="otherCopyDesktop">Copy Address</button>
+                    </div>
                 </div>
             </div>
         </div>
-        
+
         <div class="info-note">Hover over currency for details</div>
     </div>
 </div>
@@ -587,8 +847,43 @@
     </div>
 </div>
 
+<!-- ========== OTHER CURRENCIES MODAL ========== -->
+<div class="mobile-crypto-modal" id="otherCurrenciesModal">
+    <div class="mobile-crypto-content">
+        <div class="mobile-crypto-header">
+            <div class="mobile-crypto-title">Choose cryptocurrency</div>
+            <button class="mobile-crypto-close" id="otherCurrenciesClose">&times;</button>
+        </div>
+        <div class="other-select-wrap-mobile">
+            <div class="coin-dropdown coin-dropdown-mobile" id="coinDropMobile">
+                <div class="coin-drop-trigger coin-drop-trigger-mobile" id="coinDropTriggerMob">
+                    <span class="coin-drop-trigger-text">— select currency —</span>
+                    <span class="other-select-arrow-mobile" style="position:static;transform:none;margin-left:auto">▾</span>
+                </div>
+                <div class="coin-drop-list coin-drop-list-mobile" id="coinDropListMob"></div>
+            </div>
+        </div>
+        <div class="other-result-mobile" id="otherResultMobile" style="display:none;">
+            <div class="mobile-crypto-details" id="otherDetailsMobile"></div>
+            <div class="mobile-crypto-address" id="otherAddressMobile"></div>
+            <button class="mobile-copy-btn" id="otherCopyMobile">Copy Address</button>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- 0. Apply CONFIG links ---
+        const linkMap = {
+            'link-easypay':        CONFIG.links.easypay,
+            'link-monobank':       CONFIG.links.monobank,
+            'link-donationalerts': CONFIG.links.donationalerts,
+        };
+        Object.entries(linkMap).forEach(([id, url]) => {
+            const el = document.getElementById(id);
+            if (el && url) el.href = url;
+        });
+
         // --- 1. Dynamic Favicon Logic ---
         const emojis = ['💖', '🐱', '🎁', '✨', '💲'];
         let emojiIndex = 0;
@@ -620,9 +915,9 @@
                 const isEnglish = link.classList.contains('paypal') || link.classList.contains('monobank');
                 const loadingTxt = isEnglish ? 'Preparing payment...' : 'Подготовка оплаты...';
                 const subTxt = isEnglish ? 'Redirecting...' : 'Перенаправляем...';
-                
+
                 const originalHTML = this.innerHTML;
-                
+
                 // При клике: инлайн стили гарантируют, что текст будет виден
                 this.innerHTML = `
                     <div class="main-icon">⏳</div>
@@ -650,12 +945,7 @@
         }
 
         // --- 4. Crypto Logic ---
-        const cryptoData = {
-            usdt: { title: "USDT (BEP20)", details: "<strong>Network:</strong> BNB Smart Chain (BEP20)<br><strong>Coin:</strong> USDT", address: "0xc57a3603b573258fcc49faf35e7930b908d4e548" },
-            btc: { title: "Bitcoin (BTC)", details: "<strong>Network:</strong> Bitcoin<br><strong>Coin:</strong> BTC", address: "14JSDaeXXFa4ed1pkZ1dXn6SVh5cEJkGjF" },
-            eth: { title: "Ethereum (ERC20)", details: "<strong>Network:</strong> Ethereum (ERC20)<br><strong>Coin:</strong> ETH", address: "0xc57a3603b573258fcc49faf35e7930b908d4e548" },
-            binance: { title: "Binance ID", details: "<strong>Type:</strong> Binance User ID", address: "498076806" }
-        };
+        const cryptoData = CONFIG.cryptoData;
 
         const copyToClipboard = (text, btnElement) => {
             const originalText = btnElement.textContent;
@@ -695,7 +985,7 @@
         };
         let currentMobileAddress = '';
 
-        document.querySelectorAll('.crypto .method-item').forEach(item => {
+        document.querySelectorAll('.crypto .method-item:not(.other-currencies-btn)').forEach(item => {
             item.addEventListener('click', function(e) {
                 if (window.matchMedia("(max-width: 768px)").matches) {
                     e.stopPropagation();
@@ -748,7 +1038,7 @@
 
         cryptoSector.addEventListener('mouseenter', handleEnter);
         cryptoSector.addEventListener('mouseleave', handleLeave);
-        
+
         document.querySelectorAll('.crypto-popup').forEach(popup => {
             popup.addEventListener('mouseenter', handleEnter);
             popup.addEventListener('mouseleave', handleLeave);
@@ -760,7 +1050,319 @@
                 copyToClipboard(this.getAttribute('data-address'), this);
             });
         });
+        // --- 7. Other Currencies Logic ---
+        const otherModal    = document.getElementById('otherCurrenciesModal');
+        const otherClose    = document.getElementById('otherCurrenciesClose');
+        const otherResMob   = document.getElementById('otherResultMobile');
+        const otherDetMob   = document.getElementById('otherDetailsMobile');
+        const otherAdrMob   = document.getElementById('otherAddressMobile');
+        const otherCpyMob   = document.getElementById('otherCopyMobile');
+        const otherPopupDsk = document.getElementById('otherDesktopPopup');
+        const otherResDsk   = document.getElementById('otherResultDesktop');
+        const otherDetDsk   = document.getElementById('otherDetailsDesktop');
+        const otherAdrDsk   = document.getElementById('otherAddressDesktop');
+        const otherCpyDsk   = document.getElementById('otherCopyDesktop');
+
+        // Custom dropdowns
+        const dropDsk       = document.getElementById('coinDropDesktop');
+        const dropListDsk   = document.getElementById('coinDropListDsk');
+        const dropTrigDsk   = document.getElementById('coinDropTriggerDsk');
+        const dropMob       = document.getElementById('coinDropMobile');
+        const dropListMob   = document.getElementById('coinDropListMob');
+        const dropTrigMob   = document.getElementById('coinDropTriggerMob');
+
+        // Build icon element — img with onerror, emoji, or empty placeholder
+        function makeIconEl(icon, size) {
+            size = size || 20;
+            if (!icon) return makePlaceholder();
+            if (icon.includes('<img')) {
+                const srcMatch = icon.match(/src=['"](.*?)['"]/);
+                if (srcMatch) {
+                    const img = document.createElement('img');
+                    img.className = 'coin-drop-icon';
+                    img.style.width = img.style.height = size + 'px';
+                    img.src = srcMatch[1];
+                    img.onerror = () => img.replaceWith(makePlaceholder());
+                    return img;
+                }
+            }
+            if (icon.trim()) {
+                const span = document.createElement('span');
+                span.className = 'coin-drop-icon-emoji';
+                span.textContent = icon.trim();
+                return span;
+            }
+            return makePlaceholder();
+        }
+        function makePlaceholder() {
+            const s = document.createElement('span');
+            s.className = 'coin-drop-icon-placeholder';
+            return s;
+        }
+
+        // Render icon in result header area
+        function renderIconInResult(icon, container) {
+            container.innerHTML = '';
+            if (!icon) return;
+            container.appendChild(makeIconEl(icon, 22));
+        }
+
+        // Set trigger to show selected coin
+        function setTrigger(trig, c) {
+            trig.innerHTML = '';
+            trig.appendChild(makeIconEl(c.icon, 18));
+            const txt = document.createElement('span');
+            txt.className = 'coin-drop-trigger-text';
+            txt.textContent = c.title + '  —  ' + c.network;
+            trig.appendChild(txt);
+            const arr = document.createElement('span');
+            arr.style.cssText = 'margin-left:auto;opacity:0.7;font-size:12px';
+            arr.textContent = '▾';
+            trig.appendChild(arr);
+        }
+
+        // Build list items for a dropdown
+        function buildDropItems(listEl, isMobile, onSelect) {
+            listEl.innerHTML = '';
+            CONFIG.otherCurrencies.forEach(function(c, i) {
+                const item = document.createElement('div');
+                item.className = 'coin-drop-item' + (isMobile ? ' coin-drop-item-mobile' : '');
+                item.appendChild(makeIconEl(c.icon));
+                const info = document.createElement('div');
+                info.className = 'coin-drop-item-info';
+                const t = document.createElement('span');
+                t.className = 'coin-drop-item-title';
+                t.textContent = c.title;
+                const sep = document.createElement('span');
+                sep.className = 'coin-drop-item-sep';
+                sep.textContent = '—';
+                const n = document.createElement('span');
+                n.className = 'coin-drop-item-network';
+                n.textContent = c.network;
+                info.appendChild(t);
+                info.appendChild(sep);
+                info.appendChild(n);
+                item.appendChild(info);
+                item.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const trig = isMobile ? dropTrigMob : dropTrigDsk;
+                    setTrigger(trig, c);
+                    listEl.querySelectorAll('.coin-drop-item').forEach(function(el){ el.classList.remove('selected'); });
+                    item.classList.add('selected');
+                    (isMobile ? dropMob : dropDsk).classList.remove('open');
+                    onSelect(i);
+                });
+                listEl.appendChild(item);
+            });
+        }
+
+        function showOtherResult(currency, detEl, adrEl, cpyEl, resEl) {
+            detEl.innerHTML = currency.details;
+            adrEl.textContent = currency.address;
+            cpyEl.textContent = currency.copyLabel || 'Copy Address';
+            cpyEl.classList.remove('copied');
+            resEl.style.display = 'block';
+            setTimeout(function(){ cpyEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 60);
+        }
+
+        buildDropItems(dropListDsk, false, function(idx) {
+            showOtherResult(CONFIG.otherCurrencies[idx], otherDetDsk, otherAdrDsk, otherCpyDsk, otherResDsk);
+        });
+        buildDropItems(dropListMob, true, function(idx) {
+            showOtherResult(CONFIG.otherCurrencies[idx], otherDetMob, otherAdrMob, otherCpyMob, otherResMob);
+        });
+
+        // Toggle dropdowns
+        dropTrigDsk.addEventListener('click', function(e){ e.stopPropagation(); dropDsk.classList.toggle('open'); });
+        dropTrigMob.addEventListener('click', function(e){ e.stopPropagation(); dropMob.classList.toggle('open'); });
+
+        // Open/close whole popup (desktop)
+        const otherBtn = document.getElementById('otherCurrenciesBtn');
+        function openOtherDsk() {
+            otherResDsk.style.display = 'none';
+            dropDsk.classList.remove('open');
+            otherPopupDsk.classList.add('open');
+            cryptoSector.classList.add('other-open');
+        }
+        function closeOtherDsk() {
+            otherPopupDsk.classList.remove('open');
+            dropDsk.classList.remove('open');
+            cryptoSector.classList.remove('other-open');
+        }
+
+        otherBtn.addEventListener('click', function(e) {
+            if (window.matchMedia("(max-width: 768px)").matches) {
+                e.stopPropagation();
+                otherResMob.style.display = 'none';
+                dropTrigMob.innerHTML = '<span class="coin-drop-trigger-text">— select currency —</span><span style="margin-left:auto;opacity:0.7;font-size:16px">▾</span>';
+                dropMob.classList.remove('open');
+                otherModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                e.stopPropagation();
+                otherPopupDsk.classList.contains('open') ? closeOtherDsk() : openOtherDsk();
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!otherBtn.contains(e.target) && !otherPopupDsk.contains(e.target)) closeOtherDsk();
+            if (!dropMob.contains(e.target)) dropMob.classList.remove('open');
+        });
+        document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { closeOtherDsk(); closeOtherModal(); } });
+        otherPopupDsk.addEventListener('click', function(e){ e.stopPropagation(); });
+
+        otherCpyMob.addEventListener('click', function(){ copyToClipboard(otherAdrMob.textContent, this); });
+        otherCpyDsk.addEventListener('click', function(e){ e.stopPropagation(); copyToClipboard(otherAdrDsk.textContent, this); });
+
+        const closeOtherModal = function(){ otherModal.classList.remove('active'); document.body.style.overflow = ''; };
+        otherClose.addEventListener('click', closeOtherModal);
+        otherModal.addEventListener('click', function(e){ if (e.target === otherModal) closeOtherModal(); });
     });
+</script>
+
+<!-- ================================================================
+     ██████╗ ██████╗ ███╗   ██╗███████╗██╗ ██████╗
+    ██╔════╝██╔═══██╗████╗  ██║██╔════╝██║██╔════╝
+    ██║     ██║   ██║██╔██╗ ██║█████╗  ██║██║  ███╗
+    ██║     ██║   ██║██║╚██╗██║██╔══╝  ██║██║   ██║
+    ╚██████╗╚██████╔╝██║ ╚████║██║     ██║╚██████╔╝
+     ╚═════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝     ╚═╝ ╚═════╝
+
+  Все ссылки, адреса кошельков и данные валют — здесь.
+  Меняй только этот блок!
+================================================================ -->
+<script>
+    const CONFIG = {
+
+        /* ── КНОПКИ-ССЫЛКИ (верхние секции) ──────────────────────────── */
+        links: {
+            easypay:       "https://easypay.ua/moneytransfer/transfer2card?id=80001507",
+            monobank:      "https://send.monobank.ua/jar/7vf576b6aT",
+            donationalerts:"https://www.donationalerts.com/r/maiia_miller",
+            paypal:        ""   // оставь пустым если не используешь
+        },
+
+        /* ── ОСНОВНЫЕ КРИПТОВАЛЮТЫ (иконки в крипто-секции) ──────────── */
+        cryptoData: {
+            usdt: {
+                title:   "USDT (BEP20)",
+                details: "<strong>Network:</strong> BNB Smart Chain (BEP20)<br><strong>Coin:</strong> USDT",
+                address: "0xc57a3603b573258fcc49faf35e7930b908d4e548"
+            },
+            btc: {
+                title:   "Bitcoin (BTC)",
+                details: "<strong>Network:</strong> Bitcoin<br><strong>Coin:</strong> BTC",
+                address: "14JSDaeXXFa4ed1pkZ1dXn6SVh5cEJkGjF"
+            },
+            eth: {
+                title:   "Ethereum (ERC20)",
+                details: "<strong>Network:</strong> Ethereum (ERC20)<br><strong>Coin:</strong> ETH",
+                address: "0xc57a3603b573258fcc49faf35e7930b908d4e548"
+            }
+        },
+
+        /* ── OTHER CURRENCIES — выпадающий список ─────────────────────
+           icon     — эмодзи или символ для иконки
+           title    — название, показывается крупно
+           network  — мелкий подзаголовок под названием
+           details  — HTML-строка с деталями в модальном окне
+           address  — адрес/ID кошелька
+           copyLabel— текст кнопки копирования (необязательно)
+        ─────────────────────────────────────────────────────────────── */
+        otherCurrencies: [
+            {
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/1839.png' width='32' height='32'>",
+                title:     "BNB",
+                network:   "BNB Smart Chain (BEP20)",
+                details:   "<strong>Network:</strong> BNB Smart Chain (BEP20)<br><strong>Coin:</strong> BNB",
+                address:   "0xc57a3603b573258fcc49faf35e7930b908d4e548",
+                copyLabel: "Copy Address"
+            }
+            ,{
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/52.png' width='32' height='32'>",
+                title:     "Ripple",
+                network:   "BNB Smart Chain (BEP20)",
+                details:   "<strong>Network:</strong> BNB Smart Chain (BEP20)<br><strong>Coin:</strong> XRP",
+                address:   "0xc57a3603b573258fcc49faf35e7930b908d4e548",
+                copyLabel: "Copy Address"
+            }
+            ,{
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/5426.png' width='32' height='32'>",
+                title:     "Solana",
+                network:   "Solana",
+                details:   "<strong>Network:</strong> Solana<br><strong>Coin:</strong> SOL",
+                address:   "4JXHgccEycBunbxDsBomWdUkYpwvu4HTfiBGnpHhNYa5",
+                copyLabel: "Copy Address"
+            }
+            ,{
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png' width='32' height='32'>",
+                title:     "USDC",
+                network:   "Multi-chain",
+                details:   "<strong>Network:</strong> Multi-chain<br><strong>Coin:</strong> USDC",
+                address:   "0xc57a3603b573258fcc49faf35e7930b908d4e548",
+                copyLabel: "Copy Address"
+            }
+            ,{
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/11419.png' width='32' height='32'>",
+                title:     "Toncoin",
+                network:   "TON (The Open Network)",
+                details:   "<strong>Network:</strong> TON (The Open Network)<br><strong>Coin:</strong> TON",
+                address:   "UQBHGIgeD3qMwxI4r5KoJ4hiotAFHpd73q4D9Gsi8hujh2xH",
+                copyLabel: "Copy Address"
+            }
+            ,{
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/1958.png' width='32' height='32'>",
+                title:     "TRON",
+                network:   "TRON",
+                details:   "<strong>Network:</strong> TRON<br><strong>Coin:</strong> TRX",
+                address:   "TEdELurwQdsNRwuwQGXET3ryvWGMTo1nPw",
+                copyLabel: "Copy Address"
+            }
+            ,{
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/74.png' width='32' height='32'>",
+                title:     "Dogecoin",
+                network:   "Dogecoin Network",
+                details:   "<strong>Network:</strong> Dogecoin Network<br><strong>Coin:</strong> DOGE",
+                address:   "DQgwMubqNda8vpwUA3nZRFT6ezqMu54h6f",
+                copyLabel: "Copy Address"
+            }
+            ,{
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/2010.png' width='32' height='32'>",
+                title:     "Cardano",
+                network:   "Cardano",
+                details:   "<strong>Network:</strong> Cardano<br><strong>Coin:</strong> ADA",
+                address:   "addr1vye98630ml53fkqz5lpfne9m8ey3xa5m8pavf0m0ptarswclp7pen",
+                copyLabel: "Copy Address"
+            }
+            ,{
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/5805.png' width='32' height='32'>",
+                title:     "Avalanche",
+                network:   "Avalanche (C-Chain)",
+                details:   "<strong>Network:</strong> Avalanche (C-Chain)<br><strong>Coin:</strong> AVAX",
+                address:   "0xc57a3603b573258fcc49faf35e7930b908d4e548",
+                copyLabel: "Copy Address"
+            }
+            ,{
+                icon:      "<img src='https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png' width='32' height='32'>",
+                title:     "Chainlink",
+                network:   "BNB Smart Chain (BEP20)",
+                details:   "<strong>Network:</strong> BNB Smart Chain (BEP20)<br><strong>Coin:</strong> LINK",
+                address:   "0xc57a3603b573258fcc49faf35e7930b908d4e548",
+                copyLabel: "Copy Address"
+            }
+            /* Добавляй новые валюты сюда по тому же шаблону:
+            ,{
+                icon:      "🪙",
+                title:     "НАЗВАНИЕ",
+                network:   "Сеть / описание",
+                details:   "<strong>Network:</strong> ...<br><strong>Coin:</strong> ...",
+                address:   "АДРЕС_КОШЕЛЬКА",
+                copyLabel: "Copy Address"
+            }
+            */
+        ]
+
+    };
 </script>
 
 </body>
