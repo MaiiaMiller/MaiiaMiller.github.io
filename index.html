@@ -540,7 +540,35 @@
         .coin-drop-list-mobile {
             bottom: auto;
             top: calc(100% + 4px);
-            max-height: min(55vh, 400px);
+            /* Показываем ровно 3.5 строки: каждая строка ~48px (12px padding*2 + ~1px border) */
+            max-height: calc(48px * 3.5);
+            border-radius: 12px;
+            border: 1px solid rgba(139,0,255,0.65);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.7);
+            overflow-y: auto;
+            /* Firefox scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: #B39DDB transparent;
+        }
+        /* WebKit: кастомный скроллбар — всегда виден, лиловый, со скруглениями и отступом */
+        .coin-drop-list-mobile::-webkit-scrollbar {
+            width: 6px;
+        }
+        .coin-drop-list-mobile::-webkit-scrollbar-track {
+            background: transparent;
+            margin: 6px 0;
+        }
+        .coin-drop-list-mobile::-webkit-scrollbar-thumb {
+            background: #B39DDB;
+            border-radius: 10px;
+            /* Отступ справа через border + transparent — имитирует padding */
+            border-right: 3px solid transparent;
+            background-clip: padding-box;
+        }
+        .coin-drop-list-mobile::-webkit-scrollbar-thumb:hover {
+            background: #D1C4E9;
+            background-clip: padding-box;
+            border-right: 3px solid transparent;
         }
         .coin-dropdown.open .coin-drop-list { display: block; }
 
@@ -562,9 +590,11 @@
 
         .coin-drop-item-mobile {
             font-size: 14px;
-            padding: 9px 14px;
-            gap: 11px;
+            padding: 12px 14px;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
+        .coin-drop-item-mobile:last-child { border-bottom: none; }
 
         .coin-drop-icon {
             width: 20px; height: 20px;
@@ -707,6 +737,12 @@
 
             .method-icon { width: 32px; height: 32px; font-size: 18px; }
             .method-label { font-size: 9px; max-width: 50px; }
+
+            /* 1. Центрирование заголовка «Pick a coin» на мобильных */
+            .coin-drop-trigger-mobile .coin-drop-trigger-text {
+                text-align: center;
+                flex: 1;
+            }
         }
 
         @media (max-height: 600px) and (max-width: 480px) {
@@ -857,7 +893,7 @@
         <div class="other-select-wrap-mobile">
             <div class="coin-dropdown coin-dropdown-mobile" id="coinDropMobile">
                 <div class="coin-drop-trigger coin-drop-trigger-mobile" id="coinDropTriggerMob">
-                    <span class="coin-drop-trigger-text">— select currency —</span>
+                    <span class="coin-drop-trigger-text" style="flex:1;text-align:center">👉 Pick a coin 👈</span>
                     <span class="other-select-arrow-mobile" style="position:static;transform:none;margin-left:auto">▾</span>
                 </div>
                 <div class="coin-drop-list coin-drop-list-mobile" id="coinDropListMob"></div>
@@ -1194,7 +1230,7 @@
             if (window.matchMedia("(max-width: 768px)").matches) {
                 e.stopPropagation();
                 otherResMob.style.display = 'none';
-                dropTrigMob.innerHTML = '<span class="coin-drop-trigger-text">— select currency —</span><span style="margin-left:auto;opacity:0.7;font-size:16px">▾</span>';
+                dropTrigMob.innerHTML = '<span class="coin-drop-trigger-text">👉 Pick a coin 👈</span><span style="margin-left:auto;opacity:0.7;font-size:16px">▾</span>';
                 dropMob.classList.remove('open');
                 otherModal.classList.add('active');
                 document.body.style.overflow = 'hidden';
